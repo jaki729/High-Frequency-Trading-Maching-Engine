@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 1s
+  evaluation_interval: 1s
+
+scrape_configs:
+  - job_name: 'high-frequency-matching-engine'
+    static_configs:
+      - targets: ['high-frequency-matching-engine:9090']
+    scrape_interval: 1s
+    metrics_path: /metrics
+    
+rule_files:
+  - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []

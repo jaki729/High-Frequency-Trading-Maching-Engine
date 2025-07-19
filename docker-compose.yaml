@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  high-frequency-matching-engine:
+    build: .
+    container_name: high-frequency-matching-engine
+    ports:
+      - "8080:8080"   # API
+      - "9090:9090"   # Metrics endpoint
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./logs:/app/logs
+    networks:
+      - high-frequency-matching-engine-network
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: high-frequency-matching-engine-prometheus
+    ports:
+      - "9091:9090"   # Prometheus UI
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - high-frequency-matching-engine-network
+    depends_on:
+      - high-frequency-matching-engine
+
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: high-frequency-matching-engine-grafana
+    ports:
+      - "3000:3000"   # Grafana dashboard
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana:/etc/grafana/provisioning
+    networks:
+      - high-frequency-matching-engine-network
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  high-frequency-matching-engine-network:
+    driver: bridge

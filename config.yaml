@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+exchanges:
+  - name: "binance"
+    ws_url: "wss://stream.binance.com:9443/ws"
+    symbols:
+      - "BTCUSDT"
+      - "ETHUSDT"
+      - "ADAUSDT"
+  # - name: "coinbase"
+  #   ws_url: "wss://ws-feed.pro.coinbase.com"
+  #   symbols:
+  #     - "BTC-USD"
+  #     - "ETH-USD"
+
+logging:
+  level: "info"
+  file: "high_frequency_trading.log"
+
+metrics:
+  enabled: true
+  port: 9090
